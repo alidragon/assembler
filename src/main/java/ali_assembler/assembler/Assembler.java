@@ -41,12 +41,13 @@ public class Assembler {
 			if(t.getT() == Token.Type.label) {
 				labels.put(t.getString(), currentLineLabels);
 			} else if(t.getT() == Token.Type.newline) {
-				currentLine++;				
+				currentLine++;
+			} else if(t.getT() == Type.opcode) {	
 				currentLineLabels++;
-			} else if(t.getT() == Type.opcode) {
 				if(t.getString().equals("call")) {
 					Token label = tokens.next();
 					tokenList.add(label);
+					currentLineLabels--;
 					//currentLineLabels++;
 //					tokenList.add(new Token(Type.opcode, "strw"));
 //					tokenList.add(new Token(Type.param, "r13"));
@@ -70,6 +71,7 @@ public class Assembler {
 //					tokenList.add(new Token(Type.param, "r14"));
 //					currentLineLabels++;
 				} else if(t.getString().equals("return")) {
+					currentLineLabels--;
 					//get registers 0-12 from the stack
 //					for(int i = 0; i < 13; i++) {
 //						tokenList.add(new Token(Type.opcode, "ldrw"));
@@ -105,6 +107,7 @@ public class Assembler {
 						break;
 					case opcode:
 						currentLineLabels++;
+						System.out.println("incrementing for: " + t.getString());
 						switch(t.getString()) {
 							case "movw": //movw	rd, imm
 								int register = tokenIt.next().getRegister();
@@ -257,7 +260,8 @@ public class Assembler {
 										throw new CompilationException("label does not exist");
 									}
 									int labelLoc = labels.get(label);
-									int diff = labelLoc - currentLineLabels - 3;
+									int diff = labelLoc - currentLineLabels - 1;
+									System.out.println("Current place:" + currentLineLabels + " Label place:" + labelLoc + " calculated diff:" + diff);
 						            code.addByte((byte) diff);
 						            code.addByte((byte)(diff >>> 8));
 									code.addByte((byte)(diff >>> 16));
@@ -280,8 +284,8 @@ public class Assembler {
 										throw new CompilationException("label does not exist");
 									}
 									int labelLoc = labels.get(label);
-									int diff = labelLoc - currentLineLabels - 3;
-									System.out.println("DIFF: " + diff);
+									int diff = labelLoc - currentLineLabels - 1;
+									System.out.println("Current place:" + currentLineLabels + " Label place:" + labelLoc + " calculated diff:" + diff);
 						            code.addByte((byte) diff);
 						            code.addByte((byte)(diff >>> 8));
 									code.addByte((byte)(diff >>> 16));
@@ -337,7 +341,7 @@ public class Assembler {
 										throw new CompilationException("label does not exist");
 									}
 									int labelLoc = labels.get(label);
-									int diff = labelLoc - currentLineLabels - 2;
+									int diff = labelLoc - currentLineLabels - 1;
 						            code.addByte((byte) diff);
 						            code.addByte((byte)(diff >>> 8));
 									code.addByte((byte)(diff >>> 16));
@@ -346,12 +350,10 @@ public class Assembler {
 								break;
 							case "call":
 								tokenIt.next();
-								currentLineLabels--;
-								break;
 							case "return":
-								currentLineLabels--;
-								break;
 							default:
+								currentLineLabels--;
+								System.out.println("Decrementing for: " + t.getString());
 								break;
 						}
 						break;
