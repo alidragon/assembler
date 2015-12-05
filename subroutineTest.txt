@@ -12,7 +12,7 @@ loop	add	r4,r3,0x20,0
 	str	r3,r2
 	call	delay
 	bal	loop
-delay	movt	r5, 0x10
-b	subs	r5,r5,1,0
+delay	movt	r2, 0x10
+b	subs	r2,r2,1,0
 	bne	b
 	return

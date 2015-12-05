@@ -49,16 +49,16 @@ public class Assembler {
 					tokenList.add(label);
 					currentLineLabels--;
 					//currentLineLabels++;
-//					tokenList.add(new Token(Type.opcode, "strw"));
-//					tokenList.add(new Token(Type.param, "r13"));
-//					tokenList.add(new Token(Type.param, "r14"));
-//					currentLineLabels++;
-//					for(int i = 12; i >= 0; i--) {
-//						tokenList.add(new Token(Type.opcode, "strw"));
-//						tokenList.add(new Token(Type.param, "r13"));
-//						tokenList.add(new Token(Type.param, "r" + i));
-//						currentLineLabels++;
-//					}
+					tokenList.add(new Token(Type.opcode, "strw"));
+					tokenList.add(new Token(Type.param, "r13"));
+					tokenList.add(new Token(Type.param, "r14"));
+					currentLineLabels++;
+					for(int i = 12; i >= 0; i--) {
+						tokenList.add(new Token(Type.opcode, "strw"));
+						tokenList.add(new Token(Type.param, "r13"));
+						tokenList.add(new Token(Type.param, "r" + i));
+						currentLineLabels++;
+					}
 					
 					//branch w/ link to other code
 					tokenList.add(new Token(Type.opcode, "bl"));
@@ -66,19 +66,19 @@ public class Assembler {
 					currentLineLabels++;
 					
 					//get link from stack, since you couldn't do that earlier
-//					tokenList.add(new Token(Type.opcode, "ldrw"));
-//					tokenList.add(new Token(Type.param, "r13"));
-//					tokenList.add(new Token(Type.param, "r14"));
-//					currentLineLabels++;
+					tokenList.add(new Token(Type.opcode, "ldrw"));
+					tokenList.add(new Token(Type.param, "r13"));
+					tokenList.add(new Token(Type.param, "r14"));
+					currentLineLabels++;
 				} else if(t.getString().equals("return")) {
 					currentLineLabels--;
 					//get registers 0-12 from the stack
-//					for(int i = 0; i < 13; i++) {
-//						tokenList.add(new Token(Type.opcode, "ldrw"));
-//						tokenList.add(new Token(Type.param, "r13"));
-//						tokenList.add(new Token(Type.param, "r" + i));
-//						currentLineLabels++;
-//					}
+					for(int i = 0; i < 13; i++) {
+						tokenList.add(new Token(Type.opcode, "ldrw"));
+						tokenList.add(new Token(Type.param, "r13"));
+						tokenList.add(new Token(Type.param, "r" + i));
+						currentLineLabels++;
+					}
 					//Put Link into PC
 					tokenList.add(new Token(Type.opcode, "mov"));
 					tokenList.add(new Token(Type.param, "r15"));
@@ -107,7 +107,6 @@ public class Assembler {
 						break;
 					case opcode:
 						currentLineLabels++;
-						System.out.println("incrementing for: " + t.getString());
 						switch(t.getString()) {
 							case "movw": //movw	rd, imm
 								int register = tokenIt.next().getRegister();
@@ -353,7 +352,6 @@ public class Assembler {
 							case "return":
 							default:
 								currentLineLabels--;
-								System.out.println("Decrementing for: " + t.getString());
 								break;
 						}
 						break;
