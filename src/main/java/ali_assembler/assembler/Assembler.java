@@ -50,12 +50,12 @@ public class Assembler {
 					currentLineLabels--;
 					//currentLineLabels++;
 					tokenList.add(new Token(Type.opcode, "strw"));
-					tokenList.add(new Token(Type.param, "r13"));
 					tokenList.add(new Token(Type.param, "r14"));
+					tokenList.add(new Token(Type.param, "r13"));
 					currentLineLabels++;
 					for(int i = 12; i >= 0; i--) {
 						tokenList.add(new Token(Type.opcode, "strw"));
-						tokenList.add(new Token(Type.param, "r13"));
+						tokenList.add(new Token(Type.param, "r14"));
 						tokenList.add(new Token(Type.param, "r" + i));
 						currentLineLabels++;
 					}
@@ -67,15 +67,15 @@ public class Assembler {
 					
 					//get link from stack, since you couldn't do that earlier
 					tokenList.add(new Token(Type.opcode, "ldrw"));
-					tokenList.add(new Token(Type.param, "r13"));
 					tokenList.add(new Token(Type.param, "r14"));
+					tokenList.add(new Token(Type.param, "r13"));
 					currentLineLabels++;
 				} else if(t.getString().equals("return")) {
 					currentLineLabels--;
 					//get registers 0-12 from the stack
 					for(int i = 0; i < 13; i++) {
 						tokenList.add(new Token(Type.opcode, "ldrw"));
-						tokenList.add(new Token(Type.param, "r13"));
+						tokenList.add(new Token(Type.param, "r14"));
 						tokenList.add(new Token(Type.param, "r" + i));
 						currentLineLabels++;
 					}
