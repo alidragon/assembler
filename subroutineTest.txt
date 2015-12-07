@@ -7,12 +7,18 @@
 	movw	r2, 0x8000
 loop	add	r4,r3,0x20,0
 	str	r3,r2
+	movt	r5, 0x10
+	strw	r13, r5
 	call	delay
+	ldrw	r13, r5
 	add	r4,r3,0x2C,0
 	str	r3,r2
+	movt	r5, 0x4
+	strw	r13, r5
 	call	delay
+	ldrw	r13, r5
 	bal	loop
-delay	movt	r2, 0x10
+delay	ldp	r2
 b	subs	r2,r2,1,0
 	bne	b
-	return
+	return ;0x3f201000

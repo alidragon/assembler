@@ -29,11 +29,11 @@ public class Assembler {
 
 	public void AssembleAndSave() throws CompilationException, OperationNotSupportedException {
 		currentLine = 1;
-		int currentLineLabels = 1;
+		int currentLineLabels = 0;
 		List<Token> tokenList = new ArrayList<>();
 		tokenList.add(new Token(Type.opcode, "movw"));
 		tokenList.add(new Token(Type.param, "r13"));
-		tokenList.add(new Token(Type.param, "0x8000"));
+		tokenList.add(new Token(Type.param, "0x9000"));
 		currentLineLabels++;
 		while(tokens.hasNext()) {
 			Token t = tokens.next();
@@ -50,12 +50,12 @@ public class Assembler {
 					currentLineLabels--;
 					//currentLineLabels++;
 					tokenList.add(new Token(Type.opcode, "strw"));
-					tokenList.add(new Token(Type.param, "r14"));
 					tokenList.add(new Token(Type.param, "r13"));
+					tokenList.add(new Token(Type.param, "r14"));
 					currentLineLabels++;
 					for(int i = 12; i >= 0; i--) {
 						tokenList.add(new Token(Type.opcode, "strw"));
-						tokenList.add(new Token(Type.param, "r14"));
+						tokenList.add(new Token(Type.param, "r13"));
 						tokenList.add(new Token(Type.param, "r" + i));
 						currentLineLabels++;
 					}
@@ -67,15 +67,15 @@ public class Assembler {
 					
 					//get link from stack, since you couldn't do that earlier
 					tokenList.add(new Token(Type.opcode, "ldrw"));
-					tokenList.add(new Token(Type.param, "r14"));
 					tokenList.add(new Token(Type.param, "r13"));
+					tokenList.add(new Token(Type.param, "r14"));
 					currentLineLabels++;
 				} else if(t.getString().equals("return")) {
 					currentLineLabels--;
 					//get registers 0-12 from the stack
 					for(int i = 0; i < 13; i++) {
 						tokenList.add(new Token(Type.opcode, "ldrw"));
-						tokenList.add(new Token(Type.param, "r14"));
+						tokenList.add(new Token(Type.param, "r13"));
 						tokenList.add(new Token(Type.param, "r" + i));
 						currentLineLabels++;
 					}
@@ -93,7 +93,7 @@ public class Assembler {
 		}
 		System.out.println("----------------");
 		currentLine = 1;
-		currentLineLabels = 1;
+		currentLineLabels = 0;
 		Iterator<Token> tokenIt = tokenList.iterator();
 		try {
 			while(tokenIt.hasNext()) {
@@ -107,6 +107,7 @@ public class Assembler {
 						break;
 					case opcode:
 						currentLineLabels++;
+						System.out.println(currentLineLabels + ": " + t.getString());
 						switch(t.getString()) {
 							case "movw": //movw	rd, imm
 								int register = tokenIt.next().getRegister();
@@ -195,19 +196,27 @@ public class Assembler {
 								register = tokenIt.next().getRegister();
 								rd = tokenIt.next().getRegister();
 								
-								code.addByte((byte)0);
+								code.addByte((byte)4);
 								code.addByte((byte) (rd * HIGH_NIBBLE_MULTIPLIER));
 								code.addByte((byte) (2 * HIGH_NIBBLE_MULTIPLIER + register));
-								code.addByte((byte) (E * HIGH_NIBBLE_MULTIPLIER + 4));
+								code.addByte((byte) (E * HIGH_NIBBLE_MULTIPLIER + 5));
 								break;
 							case "ldrw":
 								register = tokenIt.next().getRegister();
 								rd = tokenIt.next().getRegister();
 								
-								code.addByte((byte)0);
+								code.addByte((byte)4);
 								code.addByte((byte) (rd * HIGH_NIBBLE_MULTIPLIER));
-								code.addByte((byte) (B * HIGH_NIBBLE_MULTIPLIER + register));
-								code.addByte((byte) (E * HIGH_NIBBLE_MULTIPLIER + 5));
+								code.addByte((byte) (9 * HIGH_NIBBLE_MULTIPLIER + register));
+								code.addByte((byte) (E * HIGH_NIBBLE_MULTIPLIER + 4));
+								break;
+							case "ldp":
+								rd = tokenIt.next().getRegister();
+								
+								code.addByte((byte)(14 * 4));
+								code.addByte((byte) (rd * HIGH_NIBBLE_MULTIPLIER));
+								code.addByte((byte) (9 * HIGH_NIBBLE_MULTIPLIER + 13)); //1? 9? something
+								code.addByte((byte) (E * HIGH_NIBBLE_MULTIPLIER + 5)); //KEEP THIS THE SAME
 								break;
 							case "orr":
 								token = tokenIt.next();
@@ -366,10 +375,6 @@ public class Assembler {
 		} catch(Exception e) {
 			e.printStackTrace();
 			throw new CompilationException("Invalid instruction at line: " + currentLine);
-		}
-
-		for(int i = 0; i < tokenList.size(); i++) {
-			System.out.println(tokenList.get(i).getString());
 		}
 		code.serialize();
 	}
