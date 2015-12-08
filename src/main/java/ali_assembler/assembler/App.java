@@ -14,7 +14,7 @@ import javax.naming.OperationNotSupportedException;
  */
 public class App {
 	public static void main(String[] args) {
-		String file = "subroutineTest.txt";
+		String file = "assemblyHi";
 
 		// Line counting to determine size of file to make; found on
 		// http://stackoverflow.com/questions/453018/number-of-lines-in-a-file-in-java

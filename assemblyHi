@@ -1,0 +1,16 @@
+	movw	r1, 0x1000 ;0x3f201000
+	movt	r1, 0x3f20
+loop	movw	r2, 0x48
+	str	r1, r2
+	call	delay
+	movw	r2, 0x69
+	str	r1, r2
+	call	delay
+	movw	r2, 0x20
+	str	r1, r2
+	call	delay
+	bal	loop
+delay	movt	r2,0x10
+b	subs	r2,r2,1,0
+	bne	b
+	return
